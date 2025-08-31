@@ -74,7 +74,7 @@ export default function BirthdayLanding() {
 
 /* --- Celebration component: image animation + canvas fireworks --- */
 function Celebration() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const stop = startRealisticFireworks(canvasRef);
@@ -145,7 +145,7 @@ function Celebration() {
 }
 
 /* ---------- Fireworks Engine (thin trails, shining wave on blast) ---------- */
-function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) {
+function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
   const canvas = canvasRef.current;
   if (!canvas) return;
 
@@ -154,6 +154,8 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
 
   // Resize with DPR
   function fitCanvas() {
+    if (!canvas || !ctx) return;
+    
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -200,6 +202,8 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
 
   // Thin trailing rocket spawn (rises then explodes into thin spark wave)
   function spawnRocket(x?: number, opts?: Partial<Rocket>) {
+    if (!canvas) return;
+    
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
     const startX = x ?? rand(0.08*w, 0.92*w);
@@ -219,6 +223,8 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
 
   // initial crossing volley for dramatic opening
   function initialVolley() {
+    if (!canvas) return;
+    
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
     for (let i=0;i<5;i++){
@@ -258,12 +264,16 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
 
   // draw helpers
   function drawBackground() {
+    if (!canvas || !ctx) return;
+    
     // keep a subtle dark gradient / faint stars look by drawing semi transparent rectangle
     ctx.fillStyle = "rgba(1,1,2,0.12)";
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
   }
 
   function drawRocket(r: Rocket) {
+    if (!ctx) return;
+    
     // add current position to trail array
     r.trail.push({ x: r.x, y: r.y, alpha: 1 });
     if (r.trail.length > 10) r.trail.shift();
@@ -289,6 +299,8 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
   }
 
   function drawSpark(s: Spark) {
+    if (!ctx) return;
+    
     // spark flicker and glow
     const lifeRatio = Math.max(0, 1 - s.life / s.lifespan);
     const alpha = lifeRatio * (0.95 - Math.abs(Math.sin(s.shine * 8))) ;
@@ -309,6 +321,8 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
   }
 
   function drawWave(w: Wave) {
+    if (!ctx || !canvas) return;
+    
     // thin luminous ring that expands and fades
     ctx.beginPath();
     ctx.lineWidth = 2.5;
@@ -330,6 +344,8 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
   let raf = 0;
   let lastTime = performance.now();
   function frame(time: number) {
+    if (!canvas || !ctx) return;
+    
     const dt = Math.min(1.8, (time - lastTime) / (1000/60));
     lastTime = time;
 
@@ -410,9 +426,6 @@ function startRealisticFireworks(canvasRef: React.RefObject<HTMLCanvasElement>) 
     window.removeEventListener("resize", fitCanvas);
   };
 }
-
-
-
 
 
 
