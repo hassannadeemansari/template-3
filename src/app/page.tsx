@@ -100,7 +100,7 @@ function Celebration() {
         >
           {/* Replace '/friend.jpg' in public/ with your friend's photo */}
           <motion.img
-            src="/friend.jpg"
+            src="/img5.jpg"
             alt="Friend"
             className="w-full h-full object-cover"
             initial={{ rotate: -1, filter: "grayscale(0.2) contrast(1)" }}
